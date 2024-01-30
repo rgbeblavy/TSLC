@@ -34,11 +34,9 @@ multiple comparisons, we use the Benjamini-Hochberg method.}
 \value{
 This function returns a list with the following elements.
 
-da.fun: The names of all differentially abundant pathways.
+da.taxa: A list where the names are the differentially abundant functions and elements are vectors of the differentially abundant taxa associated with each function.
 
-da.taxa: The names of all differentially abundant taxa conditional on differentially abundant pathways.
-
-result: A data frame where the columns are each taxa name, their nominal p-value, and adjusted p-value.
+result: A data frame where the columns are each taxa name, their nominal p-value, and adjusted p-value. Only taxa associated with a differentially abundant function are displayed in this data frame.
 }
 \description{
 This is a function that takes a vector indicating the group membership, the functional profile,
