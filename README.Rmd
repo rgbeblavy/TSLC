@@ -20,10 +20,10 @@ The goal of TSLC is to take into account information on both the taxa and genes/
 
 ## Installation
 
-You can install the development version of daTaxa like so:
+You can install the development version of TSLC like so:
 
 ``` r
-# FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
+install_github(repo = "rgbeblavy/TSLC")
 ```
 
 ## Example
@@ -33,7 +33,6 @@ Here, we will illustrate how to use this package to implement the two-stagewise 
 First, we will load in the file 'tax_prof_demo.csv', which gives synthetic data designed to mimic the output from Metaphlan. The following chunk of code loads this in. Note that the rows correspond to sample IDs and the columns correspond to taxa.
 
 ```{r example}
-library(tidyverse)
 library(daTaxa)
 
 metaphlan.out <- read.csv(file = "tax_prof_demo.csv", header = TRUE)
