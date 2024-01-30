@@ -13,12 +13,12 @@ knitr::opts_chunk$set(
 )
 ```
 
-# daTaxa
+# TSLC
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of daTaxa is to take into account information on both the taxa and genes/gene pathways in order to find differentially abundant taxa that are associated with a potential difference in function across two populations of interest. This is a two-stage approach that looks at differences in function across the population in the first stage, and then looks at differences in the taxa associated with each differentially abundant function in the second stage.
+The goal of TSLC is to take into account information on both the taxa and genes/gene pathways in order to find differentially abundant taxa that are associated with a potential difference in function across two populations of interest. This is a two-stage approach that looks at differences in function across the population in the first stage, and then looks at differences in the taxa associated with each differentially abundant function in the second stage.
 
 ## Installation
 
