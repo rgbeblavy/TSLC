@@ -1,5 +1,8 @@
 # library(MASS); library(parallel); library(foreach); library(doParallel); library(ggplot2)
 
+### This is a copy of the functions from the CMMB R package.
+### These will be needed for running the functions in tslc.R, but are not new for this R package.
+### See the following link: https://github.com/mbsohn/cmmb
 get.init.lambda <- function(n.sample, n.feature, tol){
   f <- function(x, p) {(qnorm(1-x/p))^4 + 2*((qnorm(1-x/p))^2) - x;}
   k <- uniroot(f, lower=0, upper=n.feature-1, tol=tol, p=n.feature)$root
