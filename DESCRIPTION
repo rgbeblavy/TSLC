@@ -1,0 +1,17 @@
+Package: TSLC
+Type: Package
+Title: Two-Stagewise Log-Contrast Model for Microbiome Differential Abundance Analysis
+Version: 0.1.0
+Author: Robert Beblavy
+Maintainer: Robert Beblavy <Robert_Beblavy@URMC.Rochester.edu>
+Description: This package is used for performing differential abundance analysis of taxa conditional
+  on their functional differences using L1 penalized log contrast models. In the first stage, this
+  method finds differentially abundant functions (genes or gene pathways) using an L1 penalized
+  probit log contrast model. In the second stage, this method looks at each function identified as
+  differentially abundant, and uses an L1 penalized log contrast model to perform differential abundance
+  analysis on the taxa associated with that function. The goal is to find those differentially abundant
+  taxa that are associated with differences in phenotype, rather than all of the differentially abundant taxa.
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.0
