@@ -11,13 +11,9 @@ two.stage.da.analysis(y, fun_prof, tax_prof, Fjs, x, cutoff = 0.1)
 of the elements of y must match the order of the samples in the rows of the functional profile, taxonomic
 profile, and matrix of covariates.}
 
-\item{fun_prof}{A matrix with the samples as rows and pathways as columns. Note that the abundances of
-each sample must be converted to proportions in order for this to work. Also, the order of the rows
-must match the order of the samples in the response vector.}
+\item{fun_prof}{A matrix with the data for the functional profile. The rows must be samples with a column Sample_Name to indicate the sample IDs. The remaining columns must be for the pathways. Note that the abundances of each sample must be converted to proportions in order for this to work. Also, the order of the rows must match the order of the samples in the response vector.}
 
-\item{tax_prof}{A matrix with the samples as rows and taxa as columns. Note that the abundances of each sample
-must be converted to proportions in order for this to work. The rownames of the taxonomic profile must
-match up to the rownames of the functional profile.}
+\item{tax_prof}{A matrix with the data for the taxonomic profile. The rows must be samples with a column Sample_Name to indicate the sample IDs. The remaining columns must be for the pathways. Note that the abundances of each sample must be converted to proportions in order for this to work. Also, the order of the rows must match the order of the samples in the response vector.}
 
 \item{Fjs}{A list where the names of the list are the same as the column names of the functional profile,
 and each element of the list is a vector indicating which microbes in the taxonomic profile are associated
@@ -27,20 +23,18 @@ with the corresponding function. The elements of the vector can be given as eith
 The rownames must match up to those of the functional and taxonomic profile, and any NA values must be
 removed from this matrix before running the method.}
 
-\item{cutoff}{A number to indicate which threshold the adjusted p-value should be cutoff at. All taxa with
-an adjusted p-value below this threshold will be detected as differentially abundant. To correct for
-multiple comparisons, we use the Benjamini-Hochberg method.}
+\item{pwy_cutoff}{A number to indicate which threshold the p-value for the pathways should be cutoff at. All pathways with a p-value below this threshold will be detected as DA.}
 }
+
+\item{tax_cutoff}{A number to indicate which threshold the p-value for the taxa should be cutoff at. All taxa with a p-value below this threshold will be detected as DA. To correct for multiple comparisons, we use the Benjamini-Hochberg method.}
+
 \value{
-This function returns a list with the following elements.
+This function returns a list with the following element.
 
-da.taxa: A list where the names are the differentially abundant functions and elements are vectors of the differentially abundant taxa associated with each function.
+associated.da.taxa: A list where the names are each function identified as differentially abundant and the elements of the list are vectors containing all associated differentially abundant taxa.
 
-result: A data frame where the columns are each taxa name, their nominal p-value, and adjusted p-value. Only taxa associated with a differentially abundant function are displayed in this data frame.
 }
 \description{
 This is a function that takes a vector indicating the group membership, the functional profile,
-the taxonomic profile, a list containing all taxa associated with each function, and a matrix of covariates
-and runs the two-stagewise approach to finding differentially abundant taxa given differentially
-abundant functions.
+the taxonomic profile, a list containing all taxa associated with each function, and a matrix of covariates and runs the two-stagewise approach to finding differentially abundant taxa given differentially abundant functions.
 }
