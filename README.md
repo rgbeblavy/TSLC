@@ -1,17 +1,5 @@
----
-output: github_document
----
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
-)
-```
 
 # TSLC
 
@@ -113,6 +101,7 @@ print(res)
 ```
 
 The output above tells us that pathway 5 is the only differentially abundant pathway, and only taxon 4 is differentially abundant.
+
 
 
 
