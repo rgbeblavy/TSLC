@@ -30,91 +30,59 @@ install_github(repo = "rgbeblavy/TSLC")
 
 ## Example
 
-Here, we will illustrate how to use this package to implement the two-stagewise approach to find differentially abundant taxa given differentially abundant functions. For the ease of illustration, we use a very low-dimensional data set consisting of 10 subjects, 10 taxa, and 5 gene pathways. The first 5 subjects belong to one population, while the last 5 subjects belong to another population. The first 4 pathways are not differentially abundant across the two populations, while the last pathway is differentially abundant across the two populations. The taxa are labeled A through J, and only species J is truly differentially abundant. In practice, this method is designed to be applied to a high-dimensional taxonomic and functional profile.
+Here, we will illustrate how to use this package to implement the two-stagewise approach to find differentially abundant taxa given differentially abundant functions. For the ease of illustration, we use a very low-dimensional data set consisting of 10 subjects, 10 taxa, and 5 gene pathways.
 
-First, we will load in the file 'tax_prof_demo.csv', which gives synthetic data designed to mimic the output from Metaphlan. The following chunk of code loads this in. Note that the rows correspond to sample IDs and the columns correspond to taxa.
+First, we will load in the file 'wmg_demo_data.csv', which gives synthetic data on the functions, as well as the taxa contributing to each function. In this data frame, the rows that do not have a vertical bar "|" give the aggregated abundances of each of the synthetic pathways, while the rows with a vertical bar tell us the contribution of the taxon to each function. The following chunk of code loads this file.
 
 ```{r example}
 library(tidyverse)
 library(TSLC)
 
-### Load demo taxonomic profile
-metaphlan.out <- read.csv(file = "tax_prof_demo.csv", header = TRUE) %>%
-  column_to_rownames(var = "X") %>%
-  as.matrix()
-
-### Add psuedocount and convert to proportions
-metaphlan.out <- ifelse(metaphlan.out == 0, 0.5, metaphlan.out) %>%
-  proportions(margin = 1) %>%
-  as.data.frame() %>%
-  rownames_to_column(var = "Sample_Name")
-head(metaphlan.out)
+wmg.dat <- read.csv(file = "wmg_demo_data.csv", header = TRUE)
+wmg.dat[,1] <- NULL # Remove the index column
+print(wmg.dat)
 ```
 
 
-Now, we will load in the file 'functional_prof_demo.csv', which contains synthetic data designed to mimic the output from Humann. This will give us information about the abundances of the pathways and the taxa associated with each pathway. The following chunk of code does this.
+Now, we just need a data frame that contains the outcome and any covariates of interest for each of the subjects. We will store this information in the variable 'meta.data'. Note that the names in the SampleID column correspond to the column names in the previous data frame. For illustration purposes, we randomly generate this dataset. However, this would be obtained from real data in practice.
 
 ```{r}
-humann.out <- read.csv(file = "functional_prof_demo.csv", header = TRUE)
-humann.out[,1] <- NULL # Remove the index column
-head(humann.out)
+set.seed(2025)
+y <- c(rep(1,5), rep(0,5)) # response variable
+x <- rnorm(n = 10, mean = 0, sd = 1) # covariate
+
+meta.data <- data.frame("SampleID" = colnames(wmg.dat)[-1],
+                        "y" = y,
+                        "X" = x)
+print(meta.data)
 ```
 
-In the data frame above, the rows that do not have a vertical bar "|" give the aggregated abundances of each of the synthetic pathways, while the rows with a vertical bar give the abundance of the pathway associated with a given species. With the functional profile in this form, we can apply the function 'get.taxa' to find the list of taxa associated with each pathway. The following chunk of code does this.
+Finally, we can use these quantities to identify the BRp taxa for this dataset. We will run the two-stagewise procedure and assign a variable for each part of the output.
 
 ```{r}
-Fjs <- get.taxa(humann.out)
-print(Fjs)
+res <- get.brp.taxa(wmgs.dat = wmg.dat, meta.dat = meta.data)
+fun.res <- res$fun.res
+tax.res <- res$tax.res
+brp.tax <- res$brp.tax
 ```
 
-We will need the above list for running the function to implement the two-stagewise approach to differential abundance analysis. Before doing this, we will need to get the functional profile in the proper form where the samples are rows and the columns are the pathways. The following chunk of code will help us convert the Humann output into the correct form.
+Let's first examine the output from the first stage where we identify DA functions. The table below displays the results from the first stage. The column "Est" gives the estimated regression coefficient after running the debiasing procedure, the column "SD" gives the standard deviation, the column "pval" gives the nominal p-value, and the column "adjp" gives the p-value after correcting for multiple comparisons. We can determine statistical significance by looking at which functions have an adjusted p-value below a certain threshold. By default, our R package considers a function to be DA if it has an adjusted p-value below 0.10. Therefore, 'pwy5' is the only DA function in the first stage.
 
 ```{r}
-humann.out.t <- humann.out %>%
-  dplyr::filter(!grepl("|", X..Pathway, fixed = TRUE)) # select only pathways giving total counts
-pwy_names <- humann.out.t$X..Pathway
-rownames(humann.out.t) <- pwy_names
-
-humann.out.t <- humann.out.t %>%
-  dplyr::select(-X..Pathway) %>% t()
-
-### Add psuedocount and convert to proportions
-tmp <- humann.out.t %>% as.matrix()
-tmp <- ifelse(tmp == 0, 0.5, tmp) %>% proportions(margin = 1)
-
-humann.out.t <- tmp %>%
-  as.data.frame() %>%
-  dplyr::mutate(Sample_Name = rownames(.)) %>%
-  dplyr::select(Sample_Name, everything())
-
-print(humann.out.t)
+print(fun.res)
 ```
 
-
-Now, we just need a vector indicating group membership and a matrix of the covariate(s) of interest to perform the differential abundance analysis. The file 'meta_dat_demo.csv' gives the simulated response variable and a simulated covariate. This can be loaded in using the following chunk of code.
+Now, let's examine the result from the second stage. The output below displays the list containing these results. Since 'pwy5' was the only DA function, we only run the second stage for 'pwy5' and all the taxa contributing to it. From the earlier data frame, only species G, H, I, and J are linked to this pathway. Therefore, the second stage looks at this subcomposition of taxa and runs a log contrast model to determine which are BRp taxa. From the output below, only species J has an adjusted p-value below 0.10, so species J is the only BRp taxon conditional on the function 'pwy5'.
 
 ```{r}
-meta.dat <- read.csv(file = "meta_dat_demo.csv", header = TRUE)
-head(meta.dat)
+print(tax.res)
 ```
 
-We can then use this to extract the vector indicating group membership and matrix containing the covariate.
+Finally, let's print out all identified BRp taxa along with their associated functions. This is stored in the variable 'brp.tax'.
 
 ```{r}
-y <- meta.dat[,"Group"] %>% as.vector()
-X <- meta.dat[,"Covariate"] %>% as.matrix()
+print(brp.tax)
 ```
-
-Finally, we can use these quantities to determine differentially abundant taxa given differentially abundant functions.
-
-```{r}
-res <- two.stage.da.analysis(y = y, fun_prof = humann.out.t, tax_prof = metaphlan.out, Fjs = Fjs, x = X)
-print(res)
-```
-
-The output above tells us that pathway 5 is the only differentially abundant pathway, and only taxon 4 is differentially abundant.
-
-
 
 
 
