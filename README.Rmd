@@ -2,17 +2,6 @@
 output: github_document
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
-)
-```
-
 # TSLC
 
 <!-- badges: start -->
@@ -34,13 +23,13 @@ Here, we will illustrate how to use this package to implement the two-stagewise 
 
 First, we will load in the file 'wmg_demo_data.csv', which gives synthetic data on the functions, as well as the taxa contributing to each function. In this data frame, the rows that do not have a vertical bar "|" give the aggregated abundances of each of the synthetic pathways, while the rows with a vertical bar tell us the contribution of the taxon to each function. The following chunk of code loads this file.
 
-```{r example}
+```{r example, message = FALSE, warning = FALSE}
 library(tidyverse)
 library(TSLC)
 
 wmg.dat <- read.csv(file = "wmg_demo_data.csv", header = TRUE)
 wmg.dat[,1] <- NULL # Remove the index column
-print(wmg.dat)
+head(wmg.dat, 7)
 ```
 
 
@@ -54,35 +43,43 @@ x <- rnorm(n = 10, mean = 0, sd = 1) # covariate
 meta.data <- data.frame("SampleID" = colnames(wmg.dat)[-1],
                         "y" = y,
                         "X" = x)
-print(meta.data)
+head(meta.data)
 ```
 
-Finally, we can use these quantities to identify the BRp taxa for this dataset. We will run the two-stagewise procedure and assign a variable for each part of the output.
+The function get.brp.taxa() implementing our two stage approach takes these two data frames as arguments.
 
 ```{r}
 res <- get.brp.taxa(wmgs.dat = wmg.dat, meta.dat = meta.data)
+```
+
+The outputs of the function get.brp.taxa() contains a list of the following information:
+
+1. results for DA analysis on functions
+
+```{r}
 fun.res <- res$fun.res
+head(fun.res)
+```
+
+2. results for identifying BRp taxa given DA functions
+
+```{r}
 tax.res <- res$tax.res
+head(tax.res)
+```
+
+
+3. names of all taxa identified as BRp
+
+```{r}
 brp.tax <- res$brp.tax
+head(brp.tax)
 ```
 
-Let's first examine the output from the first stage where we identify DA functions. The table below displays the results from the first stage. The column "Est" gives the estimated regression coefficient after running the debiasing procedure, the column "SD" gives the standard deviation, the column "pval" gives the nominal p-value, and the column "adjp" gives the p-value after correcting for multiple comparisons. We can determine statistical significance by looking at which functions have an adjusted p-value below a certain threshold. By default, our R package considers a function to be DA if it has an adjusted p-value below 0.10. Therefore, 'pwy5' is the only DA function in the first stage.
 
-```{r}
-print(fun.res)
-```
 
-Now, let's examine the result from the second stage. The output below displays the list containing these results. Since 'pwy5' was the only DA function, we only run the second stage for 'pwy5' and all the taxa contributing to it. From the earlier data frame, only species G, H, I, and J are linked to this pathway. Therefore, the second stage looks at this subcomposition of taxa and runs a log contrast model to determine which are BRp taxa. From the output below, only species J has an adjusted p-value below 0.10, so species J is the only BRp taxon conditional on the function 'pwy5'.
 
-```{r}
-print(tax.res)
-```
 
-Finally, let's print out all identified BRp taxa along with their associated functions. This is stored in the variable 'brp.tax'.
-
-```{r}
-print(brp.tax)
-```
 
 
 
