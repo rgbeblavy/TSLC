@@ -14,7 +14,8 @@ The goal of TSLC is to take into account information on both the taxa and genes/
 You can install the development version of TSLC like so:
 
 ``` r
-install_github(repo = "rgbeblavy/TSLC")
+install.packages(“devtools”)
+devtools::install_github(repo = "rgbeblavy/TSLC")
 ```
 
 ## Example
